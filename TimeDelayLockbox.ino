@@ -1,4 +1,4 @@
-/*  The Time Delay Lockbox V1.0 - By Lucian Blankevoort www.sirlucian.me
+/*  The Time Delay Lockbox V1.01 - By Lucian Blankevoort www.sirlucian.me
  *   
  *  For more instructions on building out such a box, please see the instructables for Time Delay Lockbox under my Instructables profile https://www.instructables.com/member/LucianB10/
  *  All materials needed, schematics etc are detailed there
@@ -7,6 +7,9 @@
  *  
  * Author: Lucian BLankevoort
  * License: MIT License (https://opensource.org/licenses/MIT)
+ *
+ * V1.01 - Now using minutes and hours instead of seconds, and includes the colon
+ *
  */
  
 //Libraries to include
@@ -71,12 +74,12 @@ void unlockBox(){
   display.clear();
 }
 
-// Function to begin the countdown
-void beginCountdown(int i){
+// Function to be called when beginning the countdown. Not used yet. supposed to blink out the value a few times
+void beginCountdown(){
     display.setBrightness(0x0f);
     display.clear(); 
     delay(500);
-    display.showNumberDec(displayValue);
+    display.showNumberDecEx(displayValue, 64, true);
     delay(500);
     display.clear();
 }
@@ -97,6 +100,7 @@ void setup() {
   pinMode(ARM, INPUT_PULLUP);
   pinMode(UNLOCK_BTN, INPUT_PULLUP);
   pinMode(SOLENOID, OUTPUT);
+  digitalWrite(SOLENOID, LOW);
 
   display.setBrightness(0x0f);
   // Clear display of any text
@@ -107,7 +111,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   device_state;
 
-  uint8_t displayValue = seconds;
+  //uint8_t displayValue = seconds;
+  uint8_t displayValue = secsToHourMin(seconds);
 
   //Switch to control states
   switch (device_state) {
@@ -121,17 +126,18 @@ void loop() {
       }
       // If device is not yet ready to unlock, it will display the current time left on the tube display
       while (digitalRead(UNLOCK_BTN) == LOW && seconds !=0) {
-        display.showNumberDec(displayValue);
+        display.showNumberDecEx(displayValue, 64, true);
       }
       // If the countdown timer reaches zero, it will switch to the unlockable state
       if (seconds == 0) {
-        display.showNumberDec(0, true);
+        display.showNumberDecEx(0, 64, true);
         delay(1000);
         display.clear();
         Serial.println("Box unlockable now");
         device_state = BOX_UNLOCKED;
         break;
       }
+      Serial.print("Seconds: ");
       Serial.println(seconds);
       break;
 
@@ -144,13 +150,12 @@ void loop() {
     case SET_CLOCK:
       newPosRotary = Rotary.read();
       if (newPosRotary != posRotary) {
-        posRotary = newPosRotary;
+        posRotary = newPosRotary*15;
       }
       seconds = posRotary;
-      displayValue = seconds;
 
       // The display will show the time set while you set it
-      display.showNumberDec(displayValue);
+      display.showNumberDecEx(displayValue, 64, true);
       Serial.print("Number = ");
       Serial.println(newPosRotary);
       break;
