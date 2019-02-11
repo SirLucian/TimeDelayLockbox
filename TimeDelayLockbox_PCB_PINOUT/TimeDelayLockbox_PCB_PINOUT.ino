@@ -1,4 +1,4 @@
-/*  The Time Delay Lockbox V1.11 - By Lucian Blankevoort www.sirlucian.me
+/*  The Time Delay Lockbox V1.2 - By Lucian Blankevoort www.sirlucian.me
  *   
  *  For more instructions on building out such a box, please see the instructables for Time Delay Lockbox under my Instructables profile https://www.instructables.com/member/LucianB10/
  *  All materials needed, schematics etc are detailed there
@@ -7,7 +7,10 @@
  *  
  * Author: Lucian BLankevoort
  * License: MIT License (https://opensource.org/licenses/MIT)
- * 
+ *  
+ * V1.2 - Veroboard gets a new friendlier design, 
+ *        and rails for diferent voltages are made more accessable. 
+ *        Pinouts are reassigned thusly.
  * V1.11 Serial update on switching case & display indication of state, rotary encoder now goes up by 10min increments when setting clock, Pin change because of failed 
  * V1.1 - New pinout to match circuit layout on protoboard
  * V1.01 - Now using minutes and hours instead of seconds, and includes the colon
@@ -33,12 +36,12 @@ uint8_t device_state;
 uint8_t old_state;
 
 // Switch pins for your setting your box's state. Put the middle pin on the negative rail
-#define SET 7
-#define ARM 11
+#define SET 8
+#define ARM 9
 
 // Display module connection pins (Digital Pins)
-#define CLK 8
-#define DIO 9
+#define CLK 11
+#define DIO 12
 
 //The word "OPEn" in something the display can understand... for that special moment when you may finally open your box
 const uint8_t OPEN[] = {
@@ -48,6 +51,7 @@ const uint8_t OPEN[] = {
   SEG_C | SEG_E | SEG_G                            // n
   };
 
+//The word "SEt-" for display
 const uint8_t SETCLOCK[] = {
   SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,           // S
   SEG_A | SEG_D | SEG_E | SEG_F | SEG_G,           // E
@@ -257,6 +261,5 @@ void loop() {
     default:
       break;
   }
-  
 
 }
